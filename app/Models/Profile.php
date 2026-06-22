@@ -17,4 +17,9 @@ class Profile extends Model
         'cv',
         'linkedin',
     ];
+
+
+    public function user(){
+        return $this->belongsTo(User::class);   
+    }
 }
