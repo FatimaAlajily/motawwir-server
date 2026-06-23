@@ -13,4 +13,17 @@ class Notification extends Model
         'vote_id', 
         'comment_id'
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+
+    public function vote() {
+    return $this->belongsTo(Vote::class);
+    }
+
+    public function comment() {
+    return $this->belongsTo(Comment::class);
+    }
+    
 }
