@@ -12,10 +12,11 @@ class Work extends Model
         'work_place',
         'contact',
         'hours',
+        'post_id',
     ];
 
-    public function post(){
+    public function post()
+    {
         return $this->belongsTo(Post::class);
     }
-
 }

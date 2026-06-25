@@ -18,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
     'role',
     'votra',
 
-    ])]
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -39,20 +39,39 @@ class User extends Authenticatable
     }
 
 
-    public function savedPosts(){
-        return $this->belongsToMany(Post::class , 'save_posts')
-        ->withTimestamps();
+    public function savedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'save_posts')
+            ->withTimestamps();
     }
 
-    public function posts(){
+    public function posts()
+    {
         return $this->hasMany(Post::class);
     }
 
-    public function profile(){
+    public function profile()
+    {
         return $this->hasOne(Profile::class);
     }
 
-    public function messages(){
+    public function messages()
+    {
         return $this->hasMany(Message::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function votes()
+    {
+        return $this->hasMany(Vote::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 }
