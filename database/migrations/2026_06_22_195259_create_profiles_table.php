@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('domain')->nullable();
             $table->string('cv')->nullable();
             $table->string('linkedin')->nullable();
+            // $table->foreignId('comment_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
             $table->timestamps();

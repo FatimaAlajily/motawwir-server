@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Comment;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexCommentRequest;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
@@ -12,27 +13,49 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
+
+
+    private function resourceResponse($resource = null, string $message = "Success", int $code = 200)
+    {
+        return response()->json([
+            'status' => 'success',
+            'message' => $message,
+            'data' => $resource,
+        ], $code);
+    }
+
+    private function errorResponse(string $message = "Error", int $code = 403)
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $message,
+        ], $code);
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(IndexCommentRequest $request)
     {
+        $data = $request->validated();
+
         $query = Comment::with(['user', 'votes']);
 
-        if ($request->type == 'post') {
-            $query->where('post_id', $request->post_id);
+        if ($data['type']  === 'post') {
+            $query->where('post_id', $data['post_id']);
         }
 
-        if ($request->type == 'profile') {
-            $query->where('profile_user_id', $request->profile_user_id);
+        if ($data['type']  === 'profile') {
+            $query->where('profile_user_id',  $data['profile_user_id']);
         }
 
         $comments = $query->latest()->paginate(10);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => CommentResource::collection($comments),
-        ], 200);
+        return $this->resourceResponse(
+            CommentResource::collection($comments),
+            'Comments retrieved successfully',
+            200
+        );
     }
 
     /**
@@ -40,60 +63,48 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request)
     {
-
-        $user = Auth::user();
+        $data = $request->validated();
 
         $comment = Comment::create([
-
-            'text' => $request->text,
-
-            'type' => $request->type,
-
-            'post_id' => $request->post_id,
-
-            'profile_user_id' => $request->profile_user_id,
-
-            'user_id' => $user->id,
+            'text' => $data['text'],
+            'type' => $data['type'],
+            'post_id' => $data['post_id'] ?? null,
+            'profile_user_id' => $data['profile_user_id'] ?? null,
+            'user_id' => auth()->id(),
 
         ]);
 
         $comment->load(['user', 'votes']);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Comment created successfully',
-            'data' => new CommentResource($comment),
-        ], 201);
+        return $this->resourceResponse(
+            new CommentResource($comment),
+            'Comment created successfully',
+            201
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Comment $comment) {}
 
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        if ($comment->user_id != Auth::id()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You are not authorized to update this comment.'
-            ], 403);
+        if ($comment->user_id !== auth()->id()) {
+            return $this->errorResponse('You are not authorized');
         }
 
+        $data = $request->validated();
         $comment->update([
-            'text' => $request->text,
+            'text' => $data['text'],
         ]);
 
         $comment->load(['user', 'votes']);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Comment updated successfully.',
-            'data' => new CommentResource($comment),
-        ], 200);
+        return $this->resourceResponse(
+            new CommentResource($comment),
+            'Comment updated successfully',
+            200
+        );
     }
 
     /**
@@ -101,18 +112,19 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        if ($comment->user_id != Auth::id()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'You are not authorized to delete this comment.'
-            ], 403);
+        if ($comment->user_id !== auth()->id()) {
+
+            return $this->errorResponse(
+                'You are not authorized',
+            );
         }
 
         $comment->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Comment deleted successfully.'
-        ], 200);
+        return $this->resourceResponse(
+            null,
+            'Comment deleted successfully',
+            200
+        );
     }
 }

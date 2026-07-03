@@ -25,8 +25,18 @@ class StoreCommentRequest extends FormRequest
         return [
             'text' => 'required|string|max:1000',
             'type' => 'required|in:post,profile',
-            'post_id' => 'required_if:type,post|nullable|exists:posts,id',
-            'profile_user_id' => 'required_if:type,profile|nullable|exists:users,id',
+            'post_id' => 'required_if:type,post|prohibited_if:type,profile|exists:posts,id',
+            'profile_user_id' => 'required_if:type,profile|prohibited_if:type,post|exists:users,id'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'post_id.required_if' => 'يجب تحديد المنشور عند التعليق على منشور',
+            'post_id.prohibited_if' => 'لا يجوز إرسال رقم المنشور عند التعليق على صفحة شخصية',
+            'profile_user_id.required_if' => 'يجب تحديد صاحب الصفحة عند التعليق على صفحة شخصية',
+            'profile_user_id.prohibited_if' => 'لا يجوز إرسال رقم صاحب الصفحة عند التعليق على منشور',
         ];
     }
 }
