@@ -11,6 +11,7 @@ class Comment extends Model
         'type',
         'user_id',
         'post_id',
+        'profile_user_id',
     ];
 
     public function user()
@@ -21,6 +22,11 @@ class Comment extends Model
     public function post()
     {
         return $this->belongsTo(Post::class);
+    }
+
+    public function profileUser()
+    {
+    return $this->belongsTo(User::class, 'profile_user_id');
     }
 
     public function votes()

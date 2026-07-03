@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->text('text');
             $table->enum('type', ['post', 'profile']);
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
+            $table->foreignId('post_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('profile_user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

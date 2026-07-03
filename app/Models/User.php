@@ -66,6 +66,11 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function profileComments()
+    {
+    return $this->hasMany(Comment::class, 'profile_user_id');
+    }
+
     public function votes()
     {
         return $this->hasMany(Vote::class);
