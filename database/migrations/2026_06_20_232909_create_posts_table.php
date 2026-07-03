@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->string('file')->nullable();
-            $table->string('skill');
-            $table->string('primary_link');
+            $table->string('skill')->nullable();
+            $table->string('primary_link')->nullable();
             $table->string('secondary_link')->nullable();
             $table->enum('type', ['question', 'work', 'new', 'project', 'team']);
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
