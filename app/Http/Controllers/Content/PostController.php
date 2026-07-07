@@ -8,43 +8,65 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\NewPostResource;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\ProjectPostResource;
-use App\Http\Resources\QuestionPostkResource;
+use App\Http\Resources\QuestionPostResource;
 use App\Http\Resources\TeamPostResource;
 use App\Http\Resources\WorkPostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+
 class PostController extends Controller
 {
-    // ------------- Resource Message -----------------
-    private function resourceResponse($resource = null , $post = null, string $message)
+
+
+    private const SIMPLE_TYPES = [
+        'question' => QuestionPostResource::class,
+        'team'     => TeamPostResource::class,
+    ];
+
+
+    private const FILE_TYPES = [
+        'new'     => NewPostResource::class,
+        'project' => ProjectPostResource::class,
+    ];
+
+    // ------------- Response Helpers -----------------
+
+    private function resourceResponse($resource = null, $post = null, string $message = 'Success', int $code = 200)
     {
         return response()->json([
             'status' => 'success',
             'message' => $message,
-            // 'data' => new $resource($post),
             'data' => $resource && $post ? new $resource($post) : null,
-        ], 201);
+        ], $code);
     }
 
-    // ----------------- Search Function Functions --------------------
+    private function errorResponse(string $message = 'Error', int $code = 403)
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $message,
+        ], $code);
+    }
+
+    // ----------------- Search --------------------
+
     private function searchPost($query, Request $request)
     {
-        if(!$request->filled('search')) {
-            return ;
+        if (! $request->filled('search')) {
+            return;
         }
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('title', 'like', "%{$search}%")
-          ->orWhere('content', 'like', "%{$search}%");
 
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+                ->orWhere('content', 'like', "%{$search}%");
         });
     }
 
-
-    // ----------------- Store Functions --------------------
-
+    // ----------------- File Helpers --------------------
 
     private function uploadFile(Request $request): ?string
     {
@@ -54,6 +76,15 @@ class PostController extends Controller
 
         return $request->file('file')->store('posts', 'public');
     }
+
+    private function deleteFile(?string $path): void
+    {
+        if ($path) {
+            Storage::disk('public')->delete($path);
+        }
+    }
+
+    // ----------------- Post Creation Helper --------------------
 
     private function createPost(array $data): Post
     {
@@ -69,165 +100,39 @@ class PostController extends Controller
         ]);
     }
 
-    private function storeQuestion(array $data)
+    private function saveWorkDetails(Post $post, array $data): void
     {
-        $post = $this->createPost($data);
-
-        return $this->resourceResponse(
-            QuestionPostkResource::class,
-            $post,
-            'Question created successfully'
+        $post->work()->updateOrCreate(
+            ['post_id' => $post->id],
+            [
+                'location'     => $data['location'],
+                'salary_range' => $data['salary_range'],
+                'work_place'   => $data['work_place'],
+                'contact'      => $data['contact'],
+                'hours'        => $data['hours'],
+            ]
         );
-    }
-
-    
-    private function storeNews(array $data, StorePostRequest $request)
-    {
-        $data['file'] = $this->uploadFile($request);
-
-        $post = $this->createPost($data);
-
-        return $this->resourceResponse(
-            NewPostResource::class,
-            $post,
-            'News created successfully'
-        );
-    }
-
-
-    private function storeProject(array $data, StorePostRequest $request)
-    {
-        $data['file'] = $this->uploadFile($request);
-
-        $post = $this->createPost($data);
-
-        return $this->resourceResponse(
-            ProjectPostResource::class,
-            $post,
-            'Project created successfully'
-        );
-    }
-
-    
-
-    private function storeTeam(array $data)
-    {
-        $post = $this->createPost($data);
-
-        return $this->resourceResponse(
-            TeamPostResource::class,
-            $post,
-            'Team created successfully'
-        );
-    }
-
-    private function storeWork(array $data)
-    {
-        $post = $this->createPost($data);
-
-        $post->work()->create([
-            'location'      => $data['location'],
-            'salary_range'  => $data['salary_range'],
-            'work_place'    => $data['work_place'],
-            'contact'       => $data['contact'],
-            'hours'         => $data['hours'],
-        ]);
 
         $post->load('work');
-
-        return $this->resourceResponse(
-            WorkPostResource::class,
-            $post,
-            'Work created successfully'
-        );
     }
 
-    // ----------------- Update Functions --------------------
-
-       private function updateFile(Post $post,  array $data)
-{
-       if (array_key_exists('file', $data)) {
-        $post->file = $data['file'];
-    }
-        $post->save();
-}
-
-
-    private function updateQuestion(Post $post, array $data)
-{
-    return $this->resourceResponse(
-        QuestionPostkResource::class,
-        $post,
-        'Question updated successfully'
-    );
-}
-
-private function updateWork(Post $post, array $data)
-{
-    $post->work()->updateOrCreate(
-        ['post_id' => $post->id],
-        [
-            'location'      => $data['location'],
-            'salary_range'  => $data['salary_range'],
-            'work_place'    => $data['work_place'],
-            'contact'       => $data['contact'],
-            'hours'         => $data['hours'],
-        ]
-    );
-
-    $post->load('work');
-
-    return $this->resourceResponse(
-        WorkPostResource::class,
-        $post,
-        'Work updated successfully'
-    );
-}
-
-    private function updateNews(Post $post, array $data)
-{
-        $this->updateFile($post, $data);
-
-    return $this->resourceResponse(
-        NewPostResource::class,
-        $post,
-        'News updated successfully'
-    );
-}
-
-private function updateProject(Post $post, array $data)
-{
-        $this->updateFile($post, $data);
-
-    return $this->resourceResponse(
-        ProjectPostResource::class,
-        $post,
-        'Project updated successfully'
-    );
-}
-
-private function updateTeam(Post $post, array $data)
-{
-    return $this->resourceResponse(
-        TeamPostResource::class,
-        $post,
-        'Team updated successfully'
-    );
-}
-
+    // ----------------- Controller Actions --------------------
 
     public function index(Request $request)
     {
-        $query = Post::with(['work','user']) ->withCount([
-        'votes as upvotes' => fn ($q) => $q->where('custom', 'upvote'),
-        'votes as downvotes' => fn ($q) => $q->where('custom', 'downvote'),
-        'votes as ai_votes' => fn ($q) => $q->where('custom', 'ai'),])->latest();
+        $query = Post::with(['work', 'user'])
+            ->withCount([
+                'votes as upvotes'   => fn($q) => $q->where('custom', 'upvote'),
+                'votes as downvotes' => fn($q) => $q->where('custom', 'downvote'),
+                'votes as ai_votes'  => fn($q) => $q->where('custom', 'ai'),
+            ])
+            ->latest();
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        $this->searchPost($query,$request);
+        $this->searchPost($query, $request);
 
         $posts = $query->paginate(10);
 
@@ -237,77 +142,124 @@ private function updateTeam(Post $post, array $data)
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
+        $type = $data['type'];
 
-        return match ($data['type']) {
-            'question' => $this->storeQuestion($data),
-            'new'      => $this->storeNews($data, $request),
-            'project'  => $this->storeProject($data, $request),
-            'team'     => $this->storeTeam($data),
-            'work'     => $this->storeWork($data),
-        };
+        // الأنواع التي تحتوي على ملف: نرفع الملف قبل الإنشاء
+        if (array_key_exists($type, self::FILE_TYPES)) {
+            $data['file'] = $this->uploadFile($request);
+        }
+
+        $post = $this->createPost($data);
+
+        // نوع "العمل" يحتاج جدولاً إضافياً
+        if ($type === 'work') {
+            $this->saveWorkDetails($post, $data);
+
+            return $this->resourceResponse(
+                WorkPostResource::class,
+                $post,
+                'Work created successfully',
+                201
+            );
+        }
+
+        // الأنواع البسيطة + أنواع الملفات، كلها تمر من هنا الآن
+        $resourceClass = self::SIMPLE_TYPES[$type] ?? self::FILE_TYPES[$type];
+
+        return $this->resourceResponse(
+            $resourceClass,
+            $post,
+            ucfirst($type) . ' created successfully',
+            201
+        );
     }
 
-    public function show(string $id)
+    public function show(Post $post)
     {
-        //
+        $post->load(['work', 'user']);
+
+        return $this->resourceResponse(
+            PostResource::class,
+            $post,
+            'Post retrieved successfully',
+            200
+        );
     }
 
-    public function update(UpdatePostRequest $request, string $id)
+    public function update(UpdatePostRequest $request, Post $post)
     {
-    
-        $post = Post::with('work')->findOrFail($id);
-        
+        if ($post->user_id !== auth()->id()) {
+            return $this->errorResponse('You are not authorized to update this post.');
+        }
+
+        $post->load('work');
+
         $data = $request->validated();
         $type = $data['type'] ?? $post->type;
 
-        
-        // $post->save();
-    
+        // معالجة الملف: لو أُرسل ملف جديد، احذف القديم وارفع الجديد
+        if ($request->hasFile('file')) {
+            $this->deleteFile($post->file);
+            $data['file'] = $this->uploadFile($request);
+        }
 
         $post->update([
-        'title'          => $data['title'] ?? $post->title,
-        'content'        => $data['content'] ?? $post->content,
-        'skill'          => $data['skill'] ?? $post->skill,
-        'primary_link'   => $data['primary_link'] ?? $post->primary_link,
-        'secondary_link' => $data['secondary_link'] ?? $post->secondary_link,
-        'type'           => $type,
-    ]);
+            'title'          => $data['title'] ?? $post->title,
+            'content'        => $data['content'] ?? $post->content,
+            'file'           => $data['file'] ?? $post->file,
+            'skill'          => $data['skill'] ?? $post->skill,
+            'primary_link'   => $data['primary_link'] ?? $post->primary_link,
+            'secondary_link' => $data['secondary_link'] ?? $post->secondary_link,
+            'type'           => $type,
+        ]);
 
+        if ($type === 'work') {
+            $this->saveWorkDetails($post, $data);
 
-    
-    if ($type !== 'work') {
-    $post->work()->delete();
-}
-        
+            return $this->resourceResponse(
+                WorkPostResource::class,
+                $post,
+                'Work updated successfully',
+                200
+            );
+        }
+
+        // لو تغيّر النوع من "عمل" إلى نوع آخر، احذف بيانات العمل القديمة
+        if ($post->work) {
+            $post->work()->delete();
+        }
+
         $post->load('work');
 
-    return match ($type) {
-        'question' => $this->updateQuestion($post, $data),
-        'new'      => $this->updateNews($post, $data),
-        'project'  => $this->updateProject($post, $data),
-        'team'     => $this->updateTeam($post, $data),
-        'work'     => $this->updateWork($post, $data),
-    };
+        $resourceClass = self::SIMPLE_TYPES[$type] ?? self::FILE_TYPES[$type];
+
+        return $this->resourceResponse(
+            $resourceClass,
+            $post,
+            ucfirst($type) . ' updated successfully',
+            200
+        );
     }
 
-    public function destroy(string $id)
+    public function destroy(Post $post)
     {
-          $post = Post::with('work')->findOrFail($id);
+        if ($post->user_id !== auth()->id()) {
+            return $this->errorResponse('You are not authorized to delete this post.');
+        }
 
-    if ($post->work) {
-        $post->work()->delete();
-    }
+        if ($post->work) {
+            $post->work()->delete();
+        }
 
-    if ($post->file) {
-        Storage::disk('public')->delete($post->file);
-    }
+        $this->deleteFile($post->file);
 
-    $post->delete();
+        $post->delete();
 
-     return $this->resourceResponse(
-        null,
-        null,
-        'Post deleted successfully'
-    );
+        return $this->resourceResponse(
+            null,
+            null,
+            'Post deleted successfully',
+            200
+        );
     }
 }

@@ -16,14 +16,14 @@ class PostResource extends JsonResource
     {
         return [
 
-        'data' => match ($this->type) {
-            'work' => new WorkPostResource($this),
-            'project' => new ProjectPostResource($this),
-            'new' => new NewPostResource($this),
-            'team' => new TeamPostResource($this),
-            default => new QuestionPostkResource($this),
-        },
-    ];
-    
+            'data' => match ($this->type) {
+                'work' => new WorkPostResource($this),
+                'project' => new ProjectPostResource($this),
+                'new' => new NewPostResource($this),
+                'team' => new TeamPostResource($this),
+                'question' => new QuestionPostResource($this),
+                default    => null,
+            },
+        ];
     }
 }

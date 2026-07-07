@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class QuestionPostkResource extends JsonResource
+class QuestionPostResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -23,6 +23,6 @@ class QuestionPostkResource extends JsonResource
             'created_at' => $this->created_at->toISOString(),
             'user' => new PostUserResource($this->whenLoaded('user')),
             'votes' => new VoteResource($this),
-            ];
+        ];
     }
 }

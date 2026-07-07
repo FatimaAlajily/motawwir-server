@@ -26,7 +26,7 @@ class StorePostRequest extends FormRequest
             'title' => 'required|string|min:5|max:255',
             'content' => 'required_unless:type,new|min:10',
             'type' => 'required|in:question,work,new,project,team',
-            'file' => 'required_unless:type,question,work,team|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:10240',
+            'file' => 'required_unless:type,question,work,team|file|mimes:jpg,jpeg,png,gif,mp4,pdf,doc,docx|max:10240',
             'skill' => 'required_if:type,work,project,team|string|max:64',
             'primary_link' => 'required_if:type,new,project,team|url|max:255',
             'secondary_link' => 'nullable|url|max:255',
@@ -37,6 +37,6 @@ class StorePostRequest extends FormRequest
             'work_place' => 'required_if:type,work|string|max:33',
             'contact' => 'required_if:type,work|string|max:15',
             'hours' => 'required_if:type,work|string|max:20',
-        ];  
+        ];
     }
 }

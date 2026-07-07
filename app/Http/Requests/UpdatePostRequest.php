@@ -26,7 +26,7 @@ class UpdatePostRequest extends FormRequest
             'title' => 'sometimes|string|min:5|max:255',
             'content' => 'nullable|string|min:10',
             'type' => 'sometimes|in:question,work,new,project,team',
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:10240',
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,pdf,doc,docx|max:10240',
             'skill' => 'nullable|string|max:64',
             'primary_link' => 'nullable|url|max:255',
             'secondary_link' => 'nullable|url|max:255',
