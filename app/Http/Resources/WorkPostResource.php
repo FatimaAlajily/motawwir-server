@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CommentResource extends JsonResource
+class WorkPostResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,13 +16,22 @@ class CommentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'text' => $this->text,
+            'title' => $this->title,
+            'content' => $this->content,
+            'skill' => $this->skill,
             'type' => $this->type,
             'created_at' => $this->created_at->toISOString(),
+
+        'work' => [
+            'location' => $this->work?->location ,
+            'salary_range' => $this->work?->salary_range ,
+            'work_place' => $this->work?->work_place ,
+            'contact' => $this->work?->contact ,
+            'hours' => $this->work?->hours,
             'user' => new PostUserResource($this->whenLoaded('user')),
             'votes' => new VoteResource($this),
-
-
-        ];
+        ],
+    ];
+        
     }
 }
