@@ -15,12 +15,12 @@ class PostResource extends JsonResource
     public function toArray(Request $request): array
     {
         return match ($this->type) {
-            'work' => new WorkPostResource($this)->toArray($request),
-            'project' => new ProjectPostResource($this)->toArray($request),
-            'new' => new NewPostResource($this)->toArray($request),
-            'team' => new TeamPostResource($this)->toArray($request),
-            'question' => new QuestionPostResource($this)->toArray($request),
-            default    => null,
+            'work'     => (new WorkPostResource($this))->toArray($request),
+            'project'  => (new ProjectPostResource($this))->toArray($request),
+            'new'      => (new NewPostResource($this))->toArray($request),
+            'team'     => (new TeamPostResource($this))->toArray($request),
+            'question' => (new QuestionPostResource($this))->toArray($request),
+            default    => [],
         };
     }
 }

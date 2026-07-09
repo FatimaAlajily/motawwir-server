@@ -105,11 +105,11 @@ class PostController extends Controller
         $post->work()->updateOrCreate(
             ['post_id' => $post->id],
             [
-                'location'     => $data['location'],
-                'salary_range' => $data['salary_range'],
-                'work_place'   => $data['work_place'],
-                'contact'      => $data['contact'],
-                'hours'        => $data['hours'],
+                'location'     => $data['location'] ?? $post->work?->location,
+                'salary_range' => $data['salary_range'] ?? $post->work?->salary_range,
+                'work_place'   => $data['work_place'] ?? $post->work?->work_place,
+                'contact'      => $data['contact'] ?? $post->work?->contact,
+                'hours'        => $data['hours'] ?? $post->work?->hours,
             ]
         );
 
@@ -192,7 +192,7 @@ class PostController extends Controller
             return $this->errorResponse('You are not authorized to update this post.');
         }
 
-        $post->load('work');
+        $post->load('work', 'user');
 
         $data = $request->validated();
         $type = $data['type'] ?? $post->type;

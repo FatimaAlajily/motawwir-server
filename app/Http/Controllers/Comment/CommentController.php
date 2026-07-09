@@ -41,11 +41,11 @@ class CommentController extends Controller
 
         $query = Comment::with(['user', 'votes']);
 
-        if ($data['type']  === 'post') {
+        if (($data['type'] ?? null) === 'post') {
             $query->where('post_id', $data['post_id']);
         }
 
-        if ($data['type']  === 'profile') {
+        if (($data['type'] ?? null) === 'profile') {
             $query->where('profile_user_id',  $data['profile_user_id']);
         }
 
