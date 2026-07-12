@@ -3,6 +3,7 @@
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Authentication\Member\AuthController;
 use App\Http\Controllers\Content\PostController;
+use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Vote\VoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,7 +33,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('votes')->group(function () {
         Route::post('/', [VoteController::class, 'store']);
     });
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::post('/', [ProfileController::class, 'update']);
+    });
 });
+
+
+
 
 Route::get('comments', [CommentController::class, 'index']);
 

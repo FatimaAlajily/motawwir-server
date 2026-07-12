@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('bio')->nullable();
             $table->string('phone')->nullable();
             $table->string('location')->nullable();
-            $table->string('skill')->nullable();
+            $table->json('skill')->nullable();
             $table->string('github')->nullable();
             $table->string('gmail')->nullable();
             $table->string('domain')->nullable();
