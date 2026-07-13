@@ -262,4 +262,34 @@ class PostController extends Controller
             200
         );
     }
+
+
+    public function toggleSave(Post $post)
+    {
+        $result = $post->savedByUsers()->toggle(auth()->id());
+
+        $saved = count($result['attached']) > 0;
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => $saved ? 'Post saved successfully' : 'Post unsaved successfully',
+            'data'    => ['saved' => $saved],
+        ], 200);
+    }
+
+
+    public function savedPosts(Request $request)
+    {
+        $posts = Post::with(['work', 'user'])
+            ->withCount([
+                'votes as upvotes'   => fn($q) => $q->where('custom', 'upvote'),
+                'votes as downvotes' => fn($q) => $q->where('custom', 'downvote'),
+                'votes as ai_votes'  => fn($q) => $q->where('custom', 'ai'),
+            ])
+            ->whereHas('savedByUsers', fn($q) => $q->where('user_id', auth()->id()))
+            ->latest()
+            ->paginate(10);
+
+        return PostResource::collection($posts);
+    }
 }

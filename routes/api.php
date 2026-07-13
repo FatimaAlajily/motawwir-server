@@ -3,6 +3,8 @@
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Authentication\Member\AuthController;
 use App\Http\Controllers\Content\PostController;
+use App\Http\Controllers\Profile\ProfileController;
+use App\Http\Controllers\Vote\VoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,9 +29,24 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    Route::apiResource('/posts' , PostController::class);
+    Route::apiResource('/posts', PostController::class);
+    Route::post('/posts/{post}/save', [PostController::class, 'toggleSave']);
+    Route::get('/saved-posts', [PostController::class, 'savedPosts']);
+    Route::prefix('votes')->group(function () {
+        Route::post('/', [VoteController::class, 'store']);
+    });
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::post('/', [ProfileController::class, 'update']);
+    });
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::post('/', [ProfileController::class, 'update']);
+    });
 });
+
+
+
 
 Route::get('comments', [CommentController::class, 'index']);
 

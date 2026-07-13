@@ -19,6 +19,10 @@ class Profile extends Model
         'user_id',
     ];
 
+    protected $casts = [
+        'skill' => 'array',
+    ];
+
 
     public function user()
     {
