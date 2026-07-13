@@ -14,12 +14,29 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        // return [
+        //     'id' => $this->id,
+        //     'user_name' => $this->user_name,
+        //     'email' => $this->email,
+        //     'role' => $this->role,
+        //     'created_at' => $this->created_at->toISOString(),
+        // ];
+                $data = [
             'id' => $this->id,
             'user_name' => $this->user_name,
-            'email' => $this->email,
+            'avatar' => $this->avatar,
             'role' => $this->role,
-            'created_at' => $this->created_at->toISOString(),
         ];
+
+
+        if ($request->user()?->role === 'admin' || $request->user()?->id === $this->id) {
+            $data['email'] = $this->email;
+            $data['is_banned'] = $this->is_banned;
+            $data['ban_reason'] = $this->ban_reason;
+            $data['banned_at'] = $this->banned_at;
+        }
+
+        return $data;
     }
-}
+    }
+    
