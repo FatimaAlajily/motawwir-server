@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Authentication\Member\AuthController;
+use App\Http\Controllers\Communication\MessageController;
 use App\Http\Controllers\Content\PostController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Vote\VoteController;
@@ -39,9 +40,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [ProfileController::class, 'show']);
         Route::post('/', [ProfileController::class, 'update']);
     });
-    Route::prefix('profile')->group(function () {
-        Route::get('/', [ProfileController::class, 'show']);
-        Route::post('/', [ProfileController::class, 'update']);
+    
+    Route::prefix('chat')->group(function() {
+        Route::get('messages', [MessageController::class, 'index']);
+        Route::post('messages', [MessageController::class, 'store']);
+        Route::delete('messages/{message}', [MessageController::class, 'destroy']);
     });
 });
 
