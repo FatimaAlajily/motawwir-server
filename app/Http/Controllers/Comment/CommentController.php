@@ -89,6 +89,7 @@ class CommentController extends Controller
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
+
         if ($comment->user_id !== auth()->id()) {
             return $this->errorResponse('You are not authorized');
         }
