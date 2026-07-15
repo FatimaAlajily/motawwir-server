@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'user_name',
@@ -44,6 +45,13 @@ class User extends Authenticatable
         ];
     }
 
+    public function getAvatarUrlAttribute(): string
+    {
+        return $this->avatar
+            ? Storage::url($this->avatar)
+            : asset('images/default-avatar.png');
+    }
+
 
     public function savedPosts()
     {
@@ -73,7 +81,7 @@ class User extends Authenticatable
 
     public function profileComments()
     {
-    return $this->hasMany(Comment::class, 'profile_user_id');
+        return $this->hasMany(Comment::class, 'profile_user_id');
     }
 
     public function votes()
