@@ -17,6 +17,10 @@ class Post extends Model
         'user_id'
     ];
 
+    protected $casts = [
+        'skill' => 'array',
+    ];
+
     public function savedByUsers()
     {
         return $this->belongsToMany(User::class, 'save_posts')

@@ -27,7 +27,8 @@ class StorePostRequest extends FormRequest
             'content' => 'required_unless:type,new|min:10',
             'type' => 'required|in:question,work,new,project,team',
             'file' => 'required_unless:type,question,work,team|file|mimes:jpg,jpeg,png,gif,mp4,pdf,doc,docx|max:10240',
-            'skill' => 'required_if:type,work,project,team|string|max:64',
+            'skill' => 'required_if:type,work,project,team|array|min:1',
+            'skill.*' => 'string|max:64',
             'primary_link' => 'required_if:type,new,project,team|url|max:255',
             'secondary_link' => 'nullable|url|max:255',
 

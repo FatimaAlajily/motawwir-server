@@ -77,20 +77,19 @@ class ProfileController extends Controller
 
         $profile = Profile::where('user_id', $user->id)->first();
 
-        // رفع ملف الـ CV: لو أُرسل ملف جديد احذف القديم وارفع الجديد
+       
         if ($request->hasFile('cv')) {
             $this->deleteFile($profile?->cv);
             $data['cv'] = $this->uploadFile($request, 'cv', 'cvs');
         }
 
-        // رفع الصورة الشخصية (avatar) الخاصة بالمستخدم
+        
         if ($request->hasFile('avatar')) {
             $this->deleteFile($user->avatar);
             $data['avatar'] = $this->uploadFile($request, 'avatar', 'avatars');
         }
 
-        // تحديث بيانات المستخدم الأساسية (جدول users)
-        // ملاحظة: role مستثنى عمدًا هنا — للقراءة فقط، ولا يُسمح للمستخدم بتعديله بنفسه.
+       
         $user->update([
             'user_name' => $data['user_name'] ?? $user->user_name,
             'avatar'    => $data['avatar']    ?? $user->avatar,
@@ -103,7 +102,7 @@ class ProfileController extends Controller
                 'bio'      => $data['bio']      ?? $profile?->bio,
                 'phone'    => $data['phone']    ?? $profile?->phone,
                 'location' => $data['location'] ?? $profile?->location,
-                'skill'    => $data['skill']    ?? $profile?->skill, // مصفوفة
+                'skill'    => $data['skill']    ?? $profile?->skill, 
                 'github'   => $data['github']   ?? $profile?->github,
                 'gmail'    => $data['gmail']    ?? $profile?->gmail,
                 'domain'   => $data['domain']   ?? $profile?->domain,
