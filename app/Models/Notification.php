@@ -10,15 +10,28 @@ class Notification extends Model
         'type',
         'is_read',
         'comment_id',
+        'from_user_id',
         'vote_id',
         'user_id',
 
 
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'is_read' => 'boolean',
+        ];
+    }
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class , 'user_id');
+    }
+
+    public function fromUser()
+    {
+        return $this->belongsTo(User::class , 'from_user_id');
     }
 
     public function vote()

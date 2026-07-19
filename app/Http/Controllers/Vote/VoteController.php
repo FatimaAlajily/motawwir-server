@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Vote;
 
+use App\Events\NotificationSentEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Vote\StoreVoteRequest;
 use App\Http\Resources\VoteResource;
 use App\Models\Post;
 use App\Models\Vote;
 use App\Models\Comment;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 
 class VoteController extends Controller
@@ -59,7 +61,9 @@ class VoteController extends Controller
             ->where($column, $target->id)
             ->first();
 
-        DB::transaction(function () use ($existingVote, $data, $target, $owner, $userId, $column) {
+        $newVote = null;
+
+        DB::transaction(function () use ($existingVote, $data, $target, $owner, $userId, $column, &$newVote) {
             // نفس التصويت مرة تانية => إلغاء (toggle off)
             if ($existingVote && $existingVote->custom === $data['custom']) {
                 $owner->decrement('votra', self::POINTS[$existingVote->custom]);
@@ -72,11 +76,12 @@ class VoteController extends Controller
                 $owner->decrement('votra', self::POINTS[$existingVote->custom]);
                 $existingVote->update(['custom' => $data['custom']]);
                 $owner->increment('votra', self::POINTS[$data['custom']]);
+                $newVote = $existingVote;
                 return;
             }
 
             // تصويت جديد بالكامل
-            Vote::create([
+            $newVote = Vote::create([
                 'custom'     => $data['custom'],
                 'user_id'    => $userId,
                 'post_id'    => $data['type'] === 'post' ? $target->id : null,
@@ -85,6 +90,19 @@ class VoteController extends Controller
 
             $owner->increment('votra', self::POINTS[$data['custom']]);
         });
+
+        // ✅ إرسال إشعار فقط لو فيه تصويت فعلي (مو إلغاء)
+        if ($newVote && $owner->id !== $userId) {
+            $notification = Notification::create([
+                'type' => 'vote',
+                'user_id' => $owner->id,
+                'from_user_id' => $userId,
+                'vote_id' => $newVote->id,
+            ]);
+
+            $notification->load(['fromUser', 'vote', 'comment']);
+            broadcast(new NotificationSentEvent($notification))->toOthers();
+        }
 
         $target->loadCount([
             'votes as upvotes'   => fn($q) => $q->where('custom', 'upvote'),
@@ -98,4 +116,5 @@ class VoteController extends Controller
             200
         );
     }
+
 }

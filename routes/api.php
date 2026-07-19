@@ -5,6 +5,7 @@ use App\Http\Controllers\Authentication\Admin\UserManagementController;
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Authentication\Member\AuthController;
 use App\Http\Controllers\Communication\MessageController;
+use App\Http\Controllers\Communication\NotificationController;
 use App\Http\Controllers\Content\PostController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Vote\VoteController;
@@ -71,7 +72,17 @@ Route::middleware(['auth:sanctum', 'banned'])->group(function () {
     //------------- VOTE UPVOTE DOWNVOTE AI REPUTATION -------------
     Route::prefix('votes')->group(function () {
         Route::post('/', [VoteController::class, 'store']);
-    });
+
+
+        
+        });
+        //------------- UNREAD READ MARK NOTIFICATIONS -------------
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::get('/unread-count', [NotificationController::class, 'unReadCount']);
+            Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
+            Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+        });
 
 
     //------------- ADMIN PREMISSIONS AREA  -------------
