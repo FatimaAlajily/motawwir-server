@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Comment;
 
+use App\Events\NotificationSentEvent;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\IndexCommentRequest;
@@ -9,6 +10,7 @@ use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -75,6 +77,26 @@ class CommentController extends Controller
         ]);
 
         $comment->load(['user', 'votes']);
+
+         $targetUserId = null;
+
+           if ($data['type'] === 'post') {
+        $targetUserId = $comment->post?->user_id;
+    } elseif ($data['type'] === 'profile') {
+        $targetUserId = $data['profile_user_id'];
+    }
+    if ($targetUserId && $targetUserId !== auth()->id()) {
+        $notification = Notification::create([
+            'type' => 'comment',
+            'user_id' => $targetUserId,
+            'from_user_id' => auth()->id(),
+            'comment_id' => $comment->id,
+        ]);
+
+        $notification->load(['fromUser', 'vote', 'comment']);
+        broadcast(new NotificationSentEvent($notification))->toOthers();
+    }
+
 
         return $this->resourceResponse(
             new CommentResource($comment),
