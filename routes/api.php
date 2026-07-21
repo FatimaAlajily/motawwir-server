@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Authentication\Admin\ContentModerationController;
 use App\Http\Controllers\Authentication\Admin\UserManagementController;
+use App\Http\Controllers\Member\UserController; 
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Authentication\Member\AuthController;
 use App\Http\Controllers\Communication\MessageController;
@@ -28,9 +29,11 @@ Route::get('messages', [MessageController::class, 'index']);
 //------------- VIEW COMMENTS LIST -------------
 Route::get('comments', [CommentController::class, 'index']);
 //------------- VIEW USERS LIST -------------
-Route::get('/users', [UserManagementController::class, 'index']);
+Route::get('/users', [UserController::class, 'index']);
 //------------- VIEW A USER  -------------
-Route::get('/users/{user}', [UserManagementController::class, 'show']);
+Route::get('/users/{user}', [UserController::class, 'show']);
+//------------- VIEW A PROFILE (READ ONLY - GUEST) -------------
+Route::get('/profile/{user}', [ProfileController::class, 'show']);
 
 //------------- NOT BANNED NEED MIDDLE WARE -------------
 Route::middleware(['auth:sanctum', 'banned'])->group(function () {
@@ -44,7 +47,6 @@ Route::middleware(['auth:sanctum', 'banned'])->group(function () {
 
     //------------- PROFILE ACCOUNT -------------
     Route::prefix('profile')->group(function () {
-        Route::get('/', [ProfileController::class, 'show']);
         Route::post('/', [ProfileController::class, 'update']);
     });
 
@@ -72,17 +74,14 @@ Route::middleware(['auth:sanctum', 'banned'])->group(function () {
     //------------- VOTE UPVOTE DOWNVOTE AI REPUTATION -------------
     Route::prefix('votes')->group(function () {
         Route::post('/', [VoteController::class, 'store']);
-
-
-        
-        });
-        //------------- UNREAD READ MARK NOTIFICATIONS -------------
-        Route::prefix('notifications')->group(function () {
-            Route::get('/', [NotificationController::class, 'index']);
-            Route::get('/unread-count', [NotificationController::class, 'unReadCount']);
-            Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
-            Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
-        });
+    });
+    //------------- UNREAD READ MARK NOTIFICATIONS -------------
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unReadCount']);
+        Route::post('/{notification}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+    });
 
 
     //------------- ADMIN PREMISSIONS AREA  -------------
