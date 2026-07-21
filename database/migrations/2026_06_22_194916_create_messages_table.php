@@ -11,15 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->text('content')->nullable();
-            $table->string('file')->nullable();
-            $table->json('skill')->nullable();
-            $table->string('primary_link')->nullable();
-            $table->string('secondary_link')->nullable();
-            $table->enum('type', ['question', 'work', 'new', 'project', 'team']);
+            $table->text('message');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
@@ -30,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('messages');
     }
 };
