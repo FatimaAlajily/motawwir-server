@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('user_name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('avatar')->nullable();
+            $table->string('avatar');
             $table->enum('role', ['developer', 'client', 'company', 'admin']);
             $table->decimal('votra', 8, 2)->default(0);
             $table->dateTime('last_seen')->nullable();

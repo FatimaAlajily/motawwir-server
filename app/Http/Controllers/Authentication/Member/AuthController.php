@@ -35,23 +35,23 @@ class AuthController extends Controller
         $user = User::where('email', $data['email'])->first();
 
         if (!$user) {
-            return $this->errorResponse('User not found', 404);
+            return $this->errorResponse('البريد الألكتروني غير موجود', 404);
         }
 
         if (!Hash::check($data['password'], $user->password)) {
-            return $this->errorResponse('Invalid credentials', 401);
+            return $this->errorResponse('البيانات غير صحيحة ', 401);
         }
 
         if ($user->is_banned) {
             return $this->errorResponse(
-                'Your account has been banned' . ($user->ban_reason ? ": {$user->ban_reason}" : ''),
+                'تم حظر حسابك ' . ($user->ban_reason ? ": {$user->ban_reason}" : ''),
                 403
             );
         }
 
         $token = $user->createToken('token')->plainTextToken;
 
-        return $this->successResponse(new UserResource($user), 'Login successful', 200, ['token' => $token]);
+        return $this->successResponse(new UserResource($user), 'تم تسجيل الدخول بنجاح', 200, ['token' => $token]);
     }
 
     public function register(RegisterRequest $request)
@@ -65,13 +65,13 @@ class AuthController extends Controller
             'role' => $data['role'],
         ]);
 
-        return $this->successResponse(new UserResource($user), 'Register successful.', 201);
+        return $this->successResponse(new UserResource($user), 'تم إنشاء حسابك بنجاح', 201);
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return $this->successResponse(null, 'Logged out successfully');
+        return $this->successResponse(null, 'تم تسجيل الخروج بنجاح');
     }
 }

@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\Authentication\Admin\ContentModerationController;
 use App\Http\Controllers\Authentication\Admin\UserManagementController;
-use App\Http\Controllers\Member\UserController; 
 use App\Http\Controllers\Comment\CommentController;
 use App\Http\Controllers\Authentication\Member\AuthController;
+use App\Http\Controllers\Authentication\Member\UserController;
 use App\Http\Controllers\Communication\MessageController;
 use App\Http\Controllers\Communication\NotificationController;
 use App\Http\Controllers\Content\PostController;
