@@ -10,6 +10,7 @@ use App\Http\Controllers\Communication\NotificationController;
 use App\Http\Controllers\Content\PostController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Vote\VoteController;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -40,7 +41,7 @@ Route::middleware(['auth:sanctum', 'banned'])->group(function () {
 
     //------------- VIEW CURRENT AUTHENTICATED USER -------------
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return new UserResource($request->user());
     });
     //------------- LOG OUT USER -------------
     Route::post('/logout', [AuthController::class, 'logout']);
