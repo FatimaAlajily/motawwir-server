@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Member;
+namespace App\Http\Controllers\Authentication\Member;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
