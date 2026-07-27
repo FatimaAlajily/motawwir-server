@@ -41,7 +41,11 @@ Route::middleware(['auth:sanctum', 'banned'])->group(function () {
 
     //------------- VIEW CURRENT AUTHENTICATED USER -------------
     Route::get('/user', function (Request $request) {
-        return new UserResource($request->user());
+        return response()->json([
+        'status' => 'success',
+        'message' => 'تم جلب بيانات المستخدم بنجاح',
+        'data' => new UserResource($request->user()),
+    ]); 
     });
     //------------- LOG OUT USER -------------
     Route::post('/logout', [AuthController::class, 'logout']);

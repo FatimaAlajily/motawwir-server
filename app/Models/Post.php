@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
 {
@@ -20,6 +21,13 @@ class Post extends Model
     protected $casts = [
         'skill' => 'array',
     ];
+
+      public function getFileUrlAttribute(): ?string
+    {
+        return $this->file
+            ? url(Storage::url($this->file))
+            : null;
+    }
 
     public function savedByUsers()
     {
