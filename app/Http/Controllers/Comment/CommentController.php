@@ -78,24 +78,24 @@ class CommentController extends Controller
 
         $comment->load(['user', 'votes']);
 
-         $targetUserId = null;
+        $targetUserId = null;
 
-           if ($data['type'] === 'post') {
-        $targetUserId = $comment->post?->user_id;
-    } elseif ($data['type'] === 'profile') {
-        $targetUserId = $data['profile_user_id'];
-    }
-    if ($targetUserId && $targetUserId !== auth()->id()) {
-        $notification = Notification::create([
-            'type' => 'comment',
-            'user_id' => $targetUserId,
-            'from_user_id' => auth()->id(),
-            'comment_id' => $comment->id,
-        ]);
+        if ($data['type'] === 'post') {
+            $targetUserId = $comment->post?->user_id;
+        } elseif ($data['type'] === 'profile') {
+            $targetUserId = $data['profile_user_id'];
+        }
+        if ($targetUserId && $targetUserId !== auth()->id()) {
+            $notification = Notification::create([
+                'type' => 'comment',
+                'user_id' => $targetUserId,
+                'from_user_id' => auth()->id(),
+                'comment_id' => $comment->id,
+            ]);
 
-        $notification->load(['fromUser', 'vote', 'comment']);
-        broadcast(new NotificationSentEvent($notification))->toOthers();
-    }
+            $notification->load(['fromUser', 'vote', 'comment']);
+            broadcast(new NotificationSentEvent($notification))->toOthers();
+        }
 
 
         return $this->resourceResponse(

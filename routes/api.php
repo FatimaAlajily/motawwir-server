@@ -47,6 +47,7 @@ Route::middleware(['auth:sanctum', 'banned'])->group(function () {
 
     //------------- PROFILE ACCOUNT -------------
     Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
         Route::post('/', [ProfileController::class, 'update']);
     });
 
