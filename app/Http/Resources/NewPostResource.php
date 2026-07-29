@@ -18,7 +18,7 @@ class NewPostResource extends JsonResource
              'id' => $this->id,
             'title' => $this->title,
             'primary_link' => $this->primary_link,
-            'file' => $this->file,
+            'file' => $this->file_url,
             'type' => $this->type,
             'created_at' => $this->created_at->toISOString(),
             'user' => new PostUserResource($this->whenLoaded('user')),

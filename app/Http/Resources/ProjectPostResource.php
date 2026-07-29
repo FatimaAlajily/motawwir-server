@@ -18,7 +18,7 @@ class ProjectPostResource extends JsonResource
         'id' => $this->id,
         'title' => $this->title,
         'content' => $this->content,
-        'file' => $this->file,
+        'file' => $this->file_url,
         'primary_link' => $this->primary_link,
         'secondary_link' => $this->secondary_link,
         'skill' => $this->skill,
