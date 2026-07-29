@@ -27,10 +27,10 @@ class UpdatePostRequest extends FormRequest
             'content' => 'nullable|string|min:10',
             'type' => 'sometimes|in:question,work,new,project,team',
             'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,pdf,doc,docx|max:10240',
-            'skill' => 'nullable|string|max:64',
+            'skill' => 'nullable|array|min:1',
+            'skill.*' => 'string|max:64',
             'primary_link' => 'nullable|url|max:255',
             'secondary_link' => 'nullable|url|max:255',
-
             // Work fields it shows if type == work
             'location' => 'nullable|string|max:64',
             'salary_range' => 'nullable|string|max:50',
