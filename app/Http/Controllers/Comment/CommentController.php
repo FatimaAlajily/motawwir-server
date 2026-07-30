@@ -94,7 +94,12 @@ class CommentController extends Controller
             ]);
 
             $notification->load(['fromUser', 'vote', 'comment']);
-            broadcast(new NotificationSentEvent($notification))->toOthers();
+
+            try {
+                broadcast(new NotificationSentEvent($notification))->toOthers();
+            } catch (\Throwable $e) {
+                \Log::warning('Broadcast failed for comment notification: ' . $e->getMessage());
+            }
         }
 
 

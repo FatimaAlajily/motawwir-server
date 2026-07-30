@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,7 +29,7 @@ class ProfileController extends Controller
         ], $code);
     }
 
-  
+
 
     private function uploadFile(Request $request, string $field, string $folder): ?string
     {
@@ -48,15 +49,19 @@ class ProfileController extends Controller
 
     // ----------------- Controller Actions --------------------
 
-    public function show(Request $request)
+    public function show(Request $request, ?User $user = null)
     {
-        $profile = Profile::with('user')->where('user_id', auth()->id())->first();
+        $targetUserId = $user?->id ?? auth()->id();
+
+        $profile = Profile::with('user')
+            ->where('user_id', $targetUserId)
+            ->first();
 
         if (! $profile) {
-        
+
             return $this->resourceResponse(
                 ProfileResource::class,
-                new Profile(['user_id' => auth()->id()]),
+                new Profile(['user_id' => $targetUserId]),
                 'Profile not created yet',
                 200
             );
@@ -77,19 +82,19 @@ class ProfileController extends Controller
 
         $profile = Profile::where('user_id', $user->id)->first();
 
-       
+
         if ($request->hasFile('cv')) {
             $this->deleteFile($profile?->cv);
             $data['cv'] = $this->uploadFile($request, 'cv', 'cvs');
         }
 
-        
+
         if ($request->hasFile('avatar')) {
             $this->deleteFile($user->avatar);
             $data['avatar'] = $this->uploadFile($request, 'avatar', 'avatars');
         }
 
-       
+
         $user->update([
             'user_name' => $data['user_name'] ?? $user->user_name,
             'avatar'    => $data['avatar']    ?? $user->avatar,
@@ -102,7 +107,7 @@ class ProfileController extends Controller
                 'bio'      => $data['bio']      ?? $profile?->bio,
                 'phone'    => $data['phone']    ?? $profile?->phone,
                 'location' => $data['location'] ?? $profile?->location,
-                'skill'    => $data['skill']    ?? $profile?->skill, 
+                'skill'    => $data['skill']    ?? $profile?->skill,
                 'github'   => $data['github']   ?? $profile?->github,
                 'gmail'    => $data['gmail']    ?? $profile?->gmail,
                 'domain'   => $data['domain']   ?? $profile?->domain,
