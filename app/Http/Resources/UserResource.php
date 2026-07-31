@@ -21,11 +21,12 @@ class UserResource extends JsonResource
         //     'role' => $this->role,
         //     'created_at' => $this->created_at->toISOString(),
         // ];
-                $data = [
+        $data = [
             'id' => $this->id,
             'user_name' => $this->user_name,
             'avatar' => $this->avatar_url,
             'role' => $this->role,
+            'votra'     => $this->votra,
         ];
 
 
@@ -38,5 +39,4 @@ class UserResource extends JsonResource
 
         return $data;
     }
-    }
-    
+}

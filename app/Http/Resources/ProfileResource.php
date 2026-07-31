@@ -14,12 +14,12 @@ class ProfileResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-         return [
+        return [
             'id'       => $this->id,
             'bio'      => $this->bio,
             'phone'    => $this->phone,
             'location' => $this->location,
-            'skill'    => $this->skill ?? [], 
+            'skill'    => $this->skill ?? [],
             'github'   => $this->github,
             'gmail'    => $this->gmail,
             'domain'   => $this->domain,
@@ -28,8 +28,9 @@ class ProfileResource extends JsonResource
             'user'     => [
                 'id'        => $this->user?->id,
                 'user_name' => $this->user?->user_name,
-                'role'      => $this->user?->role, 
-                'avatar' => $this->user?->avatar_url,
+                'role'      => $this->user?->role,
+                'avatar'    => $this->user?->avatar ? asset('storage/' . $this->user->avatar) : null,
+                'votra'     => $this->user?->votra,
             ],
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
