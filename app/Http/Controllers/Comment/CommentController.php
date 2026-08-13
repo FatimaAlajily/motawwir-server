@@ -48,13 +48,21 @@ class CommentController extends Controller
         }
 
         if (($data['type'] ?? null) === 'profile') {
-            $query->where('profile_user_id',  $data['profile_user_id']);
+            $query->where('profile_user_id', $data['profile_user_id']);
         }
 
         $comments = $query->latest()->paginate(10);
 
         return $this->resourceResponse(
-            CommentResource::collection($comments),
+            [
+                'data' => CommentResource::collection($comments->items()),
+                'meta' => [
+                    'current_page' => $comments->currentPage(),
+                    'last_page'    => $comments->lastPage(),
+                    'per_page'     => $comments->perPage(),
+                    'total'        => $comments->total(),
+                ],
+            ],
             'Comments retrieved successfully',
             200
         );

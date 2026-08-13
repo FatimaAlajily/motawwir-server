@@ -33,7 +33,7 @@ class PostController extends Controller
 
     // ------------- Response Helpers -----------------
 
-    private function resourceResponse($resource = null, $post = null, string $message = 'Success', int $code = 200)
+    private function resourceResponse($resource = null, $post = null, string $message = 'نجح', int $code = 200)
     {
         return response()->json([
             'status' => 'success',
@@ -42,7 +42,7 @@ class PostController extends Controller
         ], $code);
     }
 
-    private function errorResponse(string $message = 'Error', int $code = 403)
+    private function errorResponse(string $message = 'خطأ', int $code = 403)
     {
         return response()->json([
             'status' => 'error',
@@ -132,12 +132,18 @@ class PostController extends Controller
             $query->where('type', $request->type);
         }
 
+        // فلترة حسب صاحب المنشور — تُستخدم لعرض منشورات مستخدم معيّن بصفحة بروفايله
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
         $this->searchPost($query, $request);
 
         $posts = $query->paginate(10);
 
         return PostResource::collection($posts);
     }
+
 
     public function store(StorePostRequest $request)
     {
@@ -158,7 +164,7 @@ class PostController extends Controller
             return $this->resourceResponse(
                 WorkPostResource::class,
                 $post,
-                'Work created successfully',
+                'تم إنشاء العمل بنجاح',
                 201
             );
         }
@@ -169,7 +175,7 @@ class PostController extends Controller
         return $this->resourceResponse(
             $resourceClass,
             $post,
-            ucfirst($type) . ' created successfully',
+            'تم إنشاء المنشور بنجاح',
             201
         );
     }
@@ -181,7 +187,7 @@ class PostController extends Controller
         return $this->resourceResponse(
             PostResource::class,
             $post,
-            'Post retrieved successfully',
+            'تم جلب المنشور بنجاح',
             200
         );
     }
@@ -189,7 +195,7 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post)
     {
         if ($post->user_id !== auth()->id()) {
-            return $this->errorResponse('You are not authorized to update this post.');
+            return $this->errorResponse('لست مخولاً لتحديث هذا المنشور.');
         }
 
         $post->load('work', 'user');
@@ -219,7 +225,7 @@ class PostController extends Controller
             return $this->resourceResponse(
                 WorkPostResource::class,
                 $post,
-                'Work updated successfully',
+                'تم تحديث العمل بنجاح',
                 200
             );
         }
@@ -236,7 +242,7 @@ class PostController extends Controller
         return $this->resourceResponse(
             $resourceClass,
             $post,
-            ucfirst($type) . ' updated successfully',
+            'تم تحديث المنشور بنجاح',
             200
         );
     }
@@ -244,7 +250,7 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         if ($post->user_id !== auth()->id()) {
-            return $this->errorResponse('You are not authorized to delete this post.');
+            return $this->errorResponse('لست مخولاً لحذف هذا المنشور.');
         }
 
         if ($post->work) {
@@ -258,7 +264,7 @@ class PostController extends Controller
         return $this->resourceResponse(
             null,
             null,
-            'Post deleted successfully',
+            'تم حذف المنشور بنجاح',
             200
         );
     }
@@ -272,7 +278,7 @@ class PostController extends Controller
 
         return response()->json([
             'status'  => 'success',
-            'message' => $saved ? 'Post saved successfully' : 'Post unsaved successfully',
+            'message' => $saved ? 'تم حفظ المنشور بنجاح' : 'تم إلغاء حفظ المنشور بنجاح',
             'data'    => ['saved' => $saved],
         ], 200);
     }

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    private function resourceResponse($resource = null, $profile = null, string $message = 'Success', int $code = 200)
+    private function resourceResponse($resource = null, $profile = null, string $message = 'نجح', int $code = 200)
     {
         return response()->json([
             'status'  => 'success',
@@ -21,7 +21,7 @@ class ProfileController extends Controller
         ], $code);
     }
 
-    private function errorResponse(string $message = 'Error', int $code = 403)
+    private function errorResponse(string $message = 'خطأ', int $code = 403)
     {
         return response()->json([
             'status'  => 'error',
@@ -62,7 +62,7 @@ class ProfileController extends Controller
             return $this->resourceResponse(
                 ProfileResource::class,
                 new Profile(['user_id' => $targetUserId]),
-                'Profile not created yet',
+                'لم يتم إنشاء الملف الشخصي بعد',
                 200
             );
         }
@@ -70,7 +70,7 @@ class ProfileController extends Controller
         return $this->resourceResponse(
             ProfileResource::class,
             $profile,
-            'Profile retrieved successfully',
+            'تم جلب الملف الشخصي بنجاح',
             200
         );
     }
@@ -121,7 +121,7 @@ class ProfileController extends Controller
         return $this->resourceResponse(
             ProfileResource::class,
             $profile,
-            'Profile updated successfully',
+            'تم تحديث الملف الشخصي بنجاح',
             200
         );
     }

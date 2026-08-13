@@ -22,7 +22,7 @@ class CheckBannedUser
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Your account has been banned' . ($user->ban_reason ? ": {$user->ban_reason}" : ''),
+                'message' => 'تم حظر حسابك' . ($user->ban_reason ? ": {$user->ban_reason}" : ''),
             ], 403);
         }
 

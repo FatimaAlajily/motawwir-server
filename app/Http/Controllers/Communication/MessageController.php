@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
-    private function successResponse($resource = null, string $message = "Success", int $code = 200)
+    private function successResponse($resource = null, string $message = "نجح", int $code = 200)
     {
         return response()->json([
             'status' => 'success',
@@ -21,7 +21,7 @@ class MessageController extends Controller
         ], $code);
     }
 
-    private function errorResponse(string $message = "Error", int $code = 403)
+    private function errorResponse(string $message = "خطأ", int $code = 403)
     {
         return response()->json([
             'status' => 'error',
@@ -46,13 +46,13 @@ class MessageController extends Controller
         $message->load('user');
         broadcast(new MessageSentEvent($message))->toOthers();
 
-        return $this->successResponse(new MessageResource($message), 'Message sent', 201);
+        return $this->successResponse(new MessageResource($message), 'تم إرسال الرسالة', 201);
     }
 
     public function destroy(Request $request, Message $message)
     {
         if ($message->user_id !== $request->user()->id) {
-            return $this->errorResponse('You cannot delete another user message', 403);
+            return $this->errorResponse('لا يمكنك حذف رسالة مستخدم آخر', 403);
         }
 
         $messageId = $message->id;
@@ -60,6 +60,6 @@ class MessageController extends Controller
 
         broadcast(new MessageDeletedEvent($messageId))->toOthers();
 
-        return $this->successResponse(['id' => $messageId], 'Message deleted successfully');
+        return $this->successResponse(['id' => $messageId], 'تم حذف الرسالة بنجاح');
     }
 }

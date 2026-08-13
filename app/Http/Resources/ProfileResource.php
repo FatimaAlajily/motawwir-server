@@ -29,7 +29,7 @@ class ProfileResource extends JsonResource
                 'id'        => $this->user?->id,
                 'user_name' => $this->user?->user_name,
                 'role'      => $this->user?->role,
-                'avatar'    => $this->user?->avatar ? asset('storage/' . $this->user->avatar) : null,
+                'avatar'    => $this->user?->avatar ? asset('storage/' . $this->user->avatar) : asset('images/default-avatar.png'),
                 'votra'     => $this->user?->votra,
             ],
             'created_at' => $this->created_at,

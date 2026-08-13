@@ -18,7 +18,7 @@ class AdminMiddleware
         if (!$request->user() || $request->user()->role !== 'admin') {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Unauthorized - Admin only',
+                'message' => 'غير مصرح - للمدراء فقط',
             ], 403);
         }
 
