@@ -27,13 +27,15 @@ class UserResource extends JsonResource
             'avatar' => $this->avatar_url,
             'role' => $this->role,
             'votra'     => $this->votra,
+            'is_banned' => (bool) $this->is_banned, 
+            'ban_reason' => $this->ban_reason,
         ];
 
 
         if ($request->user()?->role === 'admin' || $request->user()?->id === $this->id) {
             $data['email'] = $this->email;
-            $data['is_banned'] = $this->is_banned;
-            $data['ban_reason'] = $this->ban_reason;
+            // $data['is_banned'] = $this->is_banned;
+            // $data['ban_reason'] = $this->ban_reason;
             $data['banned_at'] = $this->banned_at;
         }
 
