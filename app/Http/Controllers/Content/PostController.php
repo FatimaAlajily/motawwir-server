@@ -126,7 +126,8 @@ class PostController extends Controller
                 'votes as downvotes' => fn($q) => $q->where('custom', 'downvote'),
                 'votes as ai_votes'  => fn($q) => $q->where('custom', 'ai'),
             ])
-            ->latest();
+            ->orderByRaw('(upvotes - downvotes - (ai_votes * 2)) DESC'); // الترتيب حسب صافي النقاط تنازلياً
+
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);

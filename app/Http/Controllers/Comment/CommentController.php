@@ -15,9 +15,7 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-
-
-    private function resourceResponse($resource = null, string $message = "Success", int $code = 200)
+    private function resourceResponse($resource = null, string $message = "نجح", int $code = 200)
     {
         return response()->json([
             'status' => 'success',
@@ -26,7 +24,7 @@ class CommentController extends Controller
         ], $code);
     }
 
-    private function errorResponse(string $message = "Error", int $code = 403)
+    private function errorResponse(string $message = "خطأ", int $code = 403)
     {
         return response()->json([
             'status' => 'error',
@@ -41,7 +39,13 @@ class CommentController extends Controller
     {
         $data = $request->validated();
 
-        $query = Comment::with(['user', 'votes']);
+        $query = Comment::with(['user', 'votes'])
+            ->withCount([
+                'votes as upvotes' => fn($q) => $q->where('custom', 'upvote'),
+                'votes as downvotes' => fn($q) => $q->where('custom', 'downvote'),
+                'votes as ai_votes' => fn($q) => $q->where('custom', 'ai'),
+            ])
+            ->orderByRaw('(upvotes - downvotes - (ai_votes * 2)) DESC'); // الترتيب حسب صافي النقاط للتعليقات
 
         if (($data['type'] ?? null) === 'post') {
             $query->where('post_id', $data['post_id']);
@@ -51,7 +55,7 @@ class CommentController extends Controller
             $query->where('profile_user_id', $data['profile_user_id']);
         }
 
-        $comments = $query->latest()->paginate(10);
+        $comments = $query->paginate(10);
 
         return $this->resourceResponse(
             [
@@ -63,7 +67,7 @@ class CommentController extends Controller
                     'total'        => $comments->total(),
                 ],
             ],
-            'Comments retrieved successfully',
+            'تم جلب التعليقات بنجاح',
             200
         );
     }
@@ -81,7 +85,6 @@ class CommentController extends Controller
             'post_id' => $data['post_id'] ?? null,
             'profile_user_id' => $data['profile_user_id'] ?? null,
             'user_id' => auth()->id(),
-
         ]);
 
         $comment->load(['user', 'votes']);
@@ -110,23 +113,20 @@ class CommentController extends Controller
             }
         }
 
-
         return $this->resourceResponse(
             new CommentResource($comment),
-            'Comment created successfully',
+            'تم إنشاء التعليق بنجاح',
             201
         );
     }
-
 
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
-
         if ($comment->user_id !== auth()->id()) {
-            return $this->errorResponse('You are not authorized');
+            return $this->errorResponse('لست مخولاً لتحديث هذا التعليق.');
         }
 
         $data = $request->validated();
@@ -138,7 +138,7 @@ class CommentController extends Controller
 
         return $this->resourceResponse(
             new CommentResource($comment),
-            'Comment updated successfully',
+            'تم تحديث التعليق بنجاح',
             200
         );
     }
@@ -149,17 +149,14 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {
         if ($comment->user_id !== auth()->id()) {
-
-            return $this->errorResponse(
-                'You are not authorized',
-            );
+            return $this->errorResponse('لست مخولاً لحذف هذا التعليق.');
         }
 
         $comment->delete();
 
         return $this->resourceResponse(
             null,
-            'Comment deleted successfully',
+            'تم حذف التعليق بنجاح',
             200
         );
     }
