@@ -40,4 +40,51 @@ class StorePostRequest extends FormRequest
             'hours' => 'required_if:type,work|string|max:20',
         ];
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            // العنوان
+            'title.required' => 'حقل العنوان مطلوب.',
+            'title.string' => 'يجب أن يكون العنوان نصاً.',
+            'title.min' => 'يجب أن يكون العنوان 5 أحرف على الأقل.',
+            'title.max' => 'يجب ألا يتجاوز العنوان 255 حرفاً.',
+
+            // المحتوى
+            'content.required_unless' => 'حقل المحتوى مطلوب.',
+            'content.min' => 'يجب أن يكون المحتوى 10 أحرف على الأقل.',
+
+            // النوع
+            'type.required' => 'نوع المنشور مطلوب.',
+            'type.in' => 'نوع المنشور المحدد غير صالح.',
+
+            // الملف
+            'file.required_unless' => 'الملف المرفق مطلوب.',
+            'file.file' => 'يجب أن يكون المرفق ملفاً صالحاً.',
+            'file.mimes' => 'نوع الملف غير مسموح به.',
+            'file.max' => 'حجم الملف يجب ألا يتجاوز 10 ميجابايت.',
+
+            // المهارات
+            'skill.required_if' => 'يجب اختيار مهارة واحدة على الأقل.',
+            'skill.array' => 'المهارات يجب أن تكون مصفوفة.',
+            'skill.min' => 'يجب اختيار مهارة واحدة على الأقل.',
+
+            // الروابط
+            'primary_link.required_if' => 'حقل الرابط الأساسي مطلوب.',
+            'primary_link.url' => 'يجب أن يكون الرابط الأساسي رابطاً صحيحاً.',
+            'secondary_link.url' => 'يجب أن يكون الرابط الثانوي رابطاً صحيحاً.',
+
+            // تفاصيل العمل
+            'location.required_if' => 'حقل الموقع مطلوب.',
+            'salary_range.required_if' => 'حقل نطاق الراتب مطلوب.',
+            'work_place.required_if' => 'حقل مكان العمل مطلوب.',
+            'contact.required_if' => 'حقل وسائل التواصل مطلوب.',
+            'hours.required_if' => 'حقل ساعات العمل مطلوب.',
+        ];
+    }
 }

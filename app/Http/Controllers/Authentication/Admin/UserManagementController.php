@@ -10,7 +10,7 @@ use App\Models\User;
 class UserManagementController extends Controller
 {
 
-    private function successResponse($resource = null, string $message = "Success", int $code = 200)
+    private function successResponse($resource = null, string $message = "نجح", int $code = 200)
     {
         return response()->json([
             'status' => 'success',
@@ -19,7 +19,7 @@ class UserManagementController extends Controller
         ], $code);
     }
 
-    private function errorResponse(string $message = "Error", int $code = 403)
+    private function errorResponse(string $message = "خطأ", int $code = 403)
     {
         return response()->json([
             'status' => 'error',
@@ -31,15 +31,15 @@ class UserManagementController extends Controller
     public function ban(BanUserRequest $request, User $user)
     {
         if ($user->id === $request->user()->id) {
-            return $this->errorResponse('You cannot ban yourself', 422);
+            return $this->errorResponse('لا يمكنك حظر نفسك', 422);
         }
 
         if ($user->role === 'admin') {
-            return $this->errorResponse('You cannot ban another admin', 403);
+            return $this->errorResponse('لا يمكنك حظر مدير آخر', 403);
         }
 
         if ($user->is_banned) {
-            return $this->errorResponse('User is already banned', 422);
+            return $this->errorResponse('المستخدم محظور بالفعل', 422);
         }
 
         $data = $request->validated();
@@ -52,13 +52,13 @@ class UserManagementController extends Controller
 
         $user->tokens()->delete();
 
-        return $this->successResponse(new UserResource($user), 'User banned successfully');
+        return $this->successResponse(new UserResource($user), 'تم حظر المستخدم بنجاح');
     }
 
     public function unban(User $user)
     {
         if (!$user->is_banned) {
-            return $this->errorResponse('User is not banned', 422);
+            return $this->errorResponse('المستخدم غير محظور', 422);
         }
 
         $user->update([
@@ -67,6 +67,6 @@ class UserManagementController extends Controller
             'banned_at' => null,
         ]);
 
-        return $this->successResponse(new UserResource($user), 'User unbanned successfully');
+        return $this->successResponse(new UserResource($user), 'تم إلغاء حظر المستخدم بنجاح');
     }
 }

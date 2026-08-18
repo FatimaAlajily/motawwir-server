@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
 
-    private function successResponse($resource = null, string $message = 'Success', int $code = 200)
+    private function successResponse($resource = null, string $message = 'نجح', int $code = 200)
     {
         return response()->json([
             'status'  => 'success',

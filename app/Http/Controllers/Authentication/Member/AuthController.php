@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    private function successResponse($resource = null, string $message = "Success", int $code = 200, array $extra = [])
+    private function successResponse($resource = null, string $message = "نجح", int $code = 200, array $extra = [])
     {
         return response()->json(array_merge([
             'status' => 'success',
@@ -21,7 +21,7 @@ class AuthController extends Controller
         ], $extra), $code);
     }
 
-    private function errorResponse(string $message = "Error", int $code = 403)
+    private function errorResponse(string $message = "خطأ", int $code = 403)
     {
         return response()->json([
             'status' => 'error',

@@ -12,11 +12,11 @@ use Illuminate\Http\Request;
 class ContentModerationController extends Controller
 {
     private function ensureAdmin(Request $request)
-{
-    abort_unless($request->user()?->role === 'admin', 403, 'Admin access required');
-}
+    {
+        abort_unless($request->user()?->role === 'admin', 403, 'مطلوب صلاحيات المدير');
+    }
 
-     private function successResponse($resource = null, string $message = "Success", int $code = 200 )
+    private function successResponse($resource = null, string $message = "نجح", int $code = 200)
     {
         return response()->json([
             'status' => 'success',
@@ -25,7 +25,7 @@ class ContentModerationController extends Controller
         ], $code);
     }
 
-    private function errorResponse(string $message = "Error", int $code = 403)
+    private function errorResponse(string $message = "خطأ", int $code = 403)
     {
         return response()->json([
             'status' => 'error',
@@ -33,7 +33,7 @@ class ContentModerationController extends Controller
         ], $code);
     }
 
-    public function forceDeleteMessage(Request $request , Message $message)
+    public function forceDeleteMessage(Request $request, Message $message)
     {
         $this->ensureAdmin($request);
 
@@ -41,16 +41,15 @@ class ContentModerationController extends Controller
         $message->delete();
         broadcast(new MessageDeletedEvent($messageId))->toOthers();
 
-        return $this->successResponse
-        (
+        return $this->successResponse(
             [
                 'id' => $messageId,
             ],
-                'Message removed by admin'
+            'تم حذف الرسالة بواسطة المدير'
         );
     }
 
-    public function forceDeletePost(Request $request , Post $post)
+    public function forceDeletePost(Request $request, Post $post)
     {
         $this->ensureAdmin($request);
 
@@ -59,12 +58,11 @@ class ContentModerationController extends Controller
 
         return $this->successResponse(
             ['id' => $postId],
-            'Post removed by admin'
+            'تم حذف المنشور بواسطة المدير'
         );
-
     }
 
-    public function forceDeleteComment(Request $request , Comment $comment)
+    public function forceDeleteComment(Request $request, Comment $comment)
     {
         $this->ensureAdmin($request);
 
@@ -73,7 +71,7 @@ class ContentModerationController extends Controller
 
         return $this->successResponse(
             ['id' => $commentId],
-            'Comment removed by admin'
+            'تم حذف التعليق بواسطة المدير'
         );
     }
 }
