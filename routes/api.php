@@ -12,6 +12,7 @@ use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Vote\VoteController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 //------------- NO MIDDLEWARE USER AUTH LOGIN AND RESGISTER -------------
@@ -47,6 +48,9 @@ Route::middleware(['auth:sanctum', 'banned'])->group(function () {
             'data' => new UserResource($request->user()),
         ]);
     });
+
+    // ------------ Broad -------------------
+     Broadcast::routes();
     //------------- LOG OUT USER -------------
     Route::post('/logout', [AuthController::class, 'logout']);
 
